@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace TestSur
 {
-    using HoraceOriginal;
+    using HoraceOriginal;//添加引用WCFError错误类
     public partial class Form1 : Form
     {
         public Form1()
@@ -18,7 +18,7 @@ namespace TestSur
         private void button1_Click(object sender, EventArgs e)
         {
             ServiceReference2.IclClient sc = new ServiceReference2.IclClient();
-            using (sc as IDisposable)
+            using (sc as IDisposable)//避免在捕获后sc因为被释放，不能更新信道
             {
                 try
                 {
@@ -30,9 +30,9 @@ namespace TestSur
                 catch (System.ServiceModel.FaultException<TestSur.ServiceReference2.WCFError> ex)
                 {
                     MessageBox.Show(ex.Message);
-                    (sc as ICommunicationObject).Abort();
-                }
-            }
+                    (sc as ICommunicationObject).Abort();//请不要用Close()！！！
+                }                                        //请不要用Close()！！！
+            }                                            //请不要用Close()！！！
 
         }
     }
