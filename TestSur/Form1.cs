@@ -3,6 +3,8 @@ using System.Data;
 using System.Windows.Forms;
 using System.ServiceModel;
 using System.Runtime.Serialization;
+using System.Net.NetworkInformation;
+using System.Net;
 
 
 namespace TestSur
@@ -34,6 +36,41 @@ namespace TestSur
                 }                                        //请不要用Close()！！！
             }                                            //请不要用Close()！！！
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ServiceReference2.IclClient ping = new ServiceReference2.IclClient();
+            using (ping as IDisposable)
+            {
+                try
+                {
+
+                    string serid = "1";
+                    IPAddress Address = new IPAddress(new byte[] { 202, 115, 74, 254 });//TODO:Select IPAdress from database according to the serverid
+                    long RtT = 0;//实例化参数
+                    int Ttl = 0;
+                    bool DF = true;
+                    int BfL = 32;
+                    int i = ping.PingSer(serid, Address, ref RtT, ref Ttl, DF, ref BfL);//调用Ping，返回结果
+                    if (i == 0)
+                    {
+                        MessageBox.Show("成功：" + Address.ToString() + "," + "RtT:" + RtT.ToString() + "Ttl:" + Ttl.ToString());
+
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("失败");
+                    }
+                }
+
+                catch (System.ServiceModel.FaultException<TestSur.ServiceReference2.WCFError> ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    (ping as ICommunicationObject).Abort();
+                }
+            }
         }
     }
 }
